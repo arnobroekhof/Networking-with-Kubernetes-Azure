@@ -72,9 +72,13 @@ Microsoft.Network/virtualNetworks/subnets/read
  
 # Additional subnets
 Kubernetes service address range
-Non-overlapping with other subnets in your network (does not need to be routable) and not 169.254.0.0/16, 172.30.0.0/16 and 172.31.0.0/16.  
+
+Non-overlapping with other subnets in your network (does not need to be routable) and not 169.254.0.0/16, 172.30.0.0/16 and 172.31.0.0/16.
+
 Smaller than /12
+
 Docker bridge address
+
 Non-overlapping with AKS Subnet
 
 # What is a Service?
