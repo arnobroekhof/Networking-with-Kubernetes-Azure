@@ -157,14 +157,14 @@ For management and operational purposes, nodes in an AKS cluster need to access 
 
 To increase the security of your AKS cluster, you may wish to restrict egress traffic. The cluster is configured to pull base system container images from MCR or ACR. If you lock down the egress traffic in this manner, you must define specific ports and FQDNs to allow the AKS nodes to correctly communicate with required external services. Without these authorized ports and FQDNs, your AKS nodes can't communicate with the API server or install core components.
 *   Target FQDN
- *   *.azmk8s.io – http, https (Eg. *eastus.azmk8s.io)
- *   k8s.gcr.io – http, https
- *   storage.googleapis.com - http, https
- *   *auth.docker.io – http, https
- *   *cloudflare.docker.io – http, https
- *   *registry-1.docker.io – http, https
+ *    *.azmk8s.io – http, https (Eg. *eastus.azmk8s.io)
+ *    k8s.gcr.io – http, https
+ *    storage.googleapis.com - http, https
+ *    *auth.docker.io – http, https
+ *    *cloudflare.docker.io – http, https
+ *    *registry-1.docker.io – http, https
 *   NAT Rules
- *   TCP Port 22 to AKS Destination Addresses for the Region
+*    TCP Port 22 to AKS Destination Addresses for the Region
 
  ![alt text](https://github.com/jgmitter/images/blob/master/s14.png)
 
