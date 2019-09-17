@@ -1,7 +1,6 @@
 ## Networking with Kubernetes & Azure 
 
 
-# Learning Objectives
 This document describes the difference between Basic and Advance Networking for Azure Kubernetes Service (AKS) whilst also demonstrating how to deploy and configure other networking resources such as LB, App Gateway as Ingress Controller and Azure Firewall.
 AKS allows you to bring the rich set of Azure network capabilities to containers, by utilising the same software defined networking stack that powers virtual machines. This is made possible by using the container network interface (CNI) plug-in, which is installed on the Azure Virtual Machine. The plug-in assigns IP addresses from a virtual network to containers, attaching them to the virtual network and connecting them directly to other containers and virtual network resources. The plug-in doesn’t rely on overlay networks, or routes for connectivity. 
 
@@ -14,6 +13,7 @@ At a high level, the plug-in provides the following capabilities:
 *   Pods can be assigned a public IP address, which makes them directly accessible from the internet. Pods can also access the internet themselves.
 *   It works seamlessly with Kubernetes resources such as Services, Ingress controllers, and Kube DNS. A Kubernetes Service can also be exposed internally or externally through the Azure Load Balancer.
 
+![alt text](https://github.com/jgmitter/images/blob/master/s1.jpg)
  
 Connecting Pods to a virtual network
 Pods are hosted within a virtual machine that is part of a virtual network. A pool of IP addresses for the Pods is configured as secondary addresses on a virtual machine's network interface. Azure CNI sets up the basic Network connectivity for Pods and manages the utilisation of the IP addresses in the pool. When a Pod is spun up in the virtual machine, Azure CNI assigns an available IP address from the pool and connects the Pod to a software bridge in the virtual machine. When the Pod is terminated, the IP address is returned back to the pool of addresses. The following picture shows how Pods connect to a virtual network:
