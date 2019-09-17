@@ -2,6 +2,7 @@
 
 
 This document describes the difference between Basic and Advance Networking for Azure Kubernetes Service (AKS) whilst also demonstrating how to deploy and configure other networking resources such as LB, App Gateway as Ingress Controller and Azure Firewall.
+
 AKS allows you to bring the rich set of Azure network capabilities to containers, by utilising the same software defined networking stack that powers virtual machines. This is made possible by using the container network interface (CNI) plug-in, which is installed on the Azure Virtual Machine. The plug-in assigns IP addresses from a virtual network to containers, attaching them to the virtual network and connecting them directly to other containers and virtual network resources. The plug-in doesn’t rely on overlay networks, or routes for connectivity. 
 
 At a high level, the plug-in provides the following capabilities:
@@ -15,72 +16,72 @@ At a high level, the plug-in provides the following capabilities:
 
 ![alt text](https://github.com/jgmitter/images/blob/master/s1.png)
  
-Connecting Pods to a virtual network
+# Connecting Pods to a virtual network
+
 Pods are hosted within a virtual machine that is part of a virtual network. A pool of IP addresses for the Pods is configured as secondary addresses on a virtual machine's network interface. Azure CNI sets up the basic Network connectivity for Pods and manages the utilisation of the IP addresses in the pool. When a Pod is spun up in the virtual machine, Azure CNI assigns an available IP address from the pool and connects the Pod to a software bridge in the virtual machine. When the Pod is terminated, the IP address is returned back to the pool of addresses. The following picture shows how Pods connect to a virtual network:
 
- 
+ ![alt text](https://github.com/jgmitter/images/blob/master/s2.png)
 
-Internet access
+# Internet access
 To enable Pods to access the internet, the plug-in configures iptables rules to network address translate (NAT) the internet bound traffic from Pods. The source IP address of the packet is translated to the primary IP address on the virtual machine's network interface. Windows virtual machines automatically source NAT (SNAT) traffic destined to IP addresses outside the subnet the virtual machine is in. Typically, all traffic destined to an IP address outside of the IP range of the virtual network is translated.
-Limits
+
+# Limits
+
 The plug-in supports up to 250 Pods per virtual machine and up to 16,000 Pods in a virtual network. These limits are different for Azure Kubernetes Service.
-Using the plug-in
+
+# Using the plug-in
+
 The plug-in can be used in the following ways, to provide basic virtual network attach for Pods or Docker containers:
+
 *   Azure Kubernetes Service: The plug-in is integrated into the Azure Kubernetes Service (AKS), and can be used by choosing the Advanced Networking option. Advanced Networking lets you deploy a Kubernetes cluster in an existing, or a new, virtual network. To learn more about Advanced Networking and the steps to set it up, see Network configuration in AKS.
 *   AKS-Engine: AKS-Engine is a tool that generates an Azure Resource Manager template for the deployment of a Kubernetes cluster in Azure. For detailed instructions, see Deploy the plug-in for AKS-Engine Kubernetes clusters.
 *   Creating your own Kubernetes cluster in Azure: The plug-in can be used to provide basic networking for Pods in Kubernetes clusters that you deploy yourself, without relying on AKS, or tools like the AKS-Engine. In this case, the plug-in is installed and enabled on every virtual machine in a cluster. For detailed instructions, see Deploy the plug-in for a Kubernetes cluster that you deploy yourself.
 *   Virtual network attach for Docker containers in Azure: The plug-in can be used in cases where you don’t want to create a Kubernetes cluster, and would like to create Docker containers with virtual network attach, in virtual machines. For detailed instructions, see Deploy the plug-in for Docker.
 
 
-Let’s have a look in details the two options
-Basic Networking on K8
+# Let’s have a look in details the two options
+
+# Basic Networking on K8
 Uses kubenet network plugin and has the following features:
 *   Nodes and Pods are placed on different IP subnets
 *   User Defined Routing and IP Forwarding is for connectivity between Pods across Nodes.
 
- 
-
+![alt text](https://github.com/jgmitter/images/blob/master/s3.png)
 
 This approach has some drawbacks, including degraded performance, the need to manage two IP CIDRs and complexity with Peering and On-Premise connectivity. For these reasons, you may want to consider the Advanced Networking option. 
 
-
+# Advance Networking 
  
-Advance Networking 
+![alt text](https://github.com/jgmitter/images/blob/master/s4.png)
  
-
 Unlike the basic networking approach, using the Advance Networking enabled by the CNI plug-in allows us to only manage a single IP CIDR. Offers better performance and supports both peering and on-premise connectivity out of the box. 
 
-
-
-Prerequisites on creating an Advance Networking on AKS
+# Prerequisites on creating an Advance Networking on AKS
 
 *   The virtual network for the AKS cluster must allow outbound internet connectivity.
 *   Don't create more than one AKS cluster in the same subnet.
 *   AKS clusters may not use 169.254.0.0/16, 172.30.0.0/16, or 172.31.0.0/16 for the Kubernetes service address range.
 *   The service principal used by the AKS cluster must have at least Network Contributor permissions on the subnet within your virtual network. If you wish to define a custom role instead of using the built-in Network Contributor role, the following permissions are required:
+
 Microsoft.Network/virtualNetworks/subnets/join/action
 Microsoft.Network/virtualNetworks/subnets/read
 
+# Planning IP addressing for your cluster
 
-
-Planning IP addressing for your cluster
-
+![alt text](https://github.com/jgmitter/images/blob/master/s5.png)
  
-
-
-Additional subnets
+# Additional subnets
 Kubernetes service address range
 Non-overlapping with other subnets in your network (does not need to be routable) and not 169.254.0.0/16, 172.30.0.0/16 and 172.31.0.0/16.  
 Smaller than /12
 Docker bridge address
 Non-overlapping with AKS Subnet
 
-What is a Service?
+# What is a Service?
 Logical set of Pods and a policy by which to access them. 
 The set of Pods targeted by a Service is (usually) determined by a Label Selector.
 
-
-Accessing services from inside the cluster
+#Accessing services from inside the cluster
 Kubernetes supports several types of Services. The default type is Cluster IP
 A ClusterIP Services has a stable IP address and port that is only accessible from inside the cluster. We call this IP its ClusterIP and it’s programmed into the network fabric and guaranteed to be stable for the life of the Services.
 The ClusterIP gets registered against the name of the Service on the Cluster’s native DNS service. All Pods in the cluster are pre-programmed to know the cluster’s DNS service, meaning all Pods are able to resolve Service names.
