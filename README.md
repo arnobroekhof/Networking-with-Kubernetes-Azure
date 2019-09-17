@@ -13,7 +13,7 @@ At a high level, the plug-in provides the following capabilities:
 *   Pods can be assigned a public IP address, which makes them directly accessible from the internet. Pods can also access the internet themselves.
 *   It works seamlessly with Kubernetes resources such as Services, Ingress controllers, and Kube DNS. A Kubernetes Service can also be exposed internally or externally through the Azure Load Balancer.
 
-![alt text](https://github.com/jgmitter/images/blob/master/s1.jpg)
+![alt text](https://github.com/jgmitter/images/blob/master/s1.png)
  
 Connecting Pods to a virtual network
 Pods are hosted within a virtual machine that is part of a virtual network. A pool of IP addresses for the Pods is configured as secondary addresses on a virtual machine's network interface. Azure CNI sets up the basic Network connectivity for Pods and manages the utilisation of the IP addresses in the pool. When a Pod is spun up in the virtual machine, Azure CNI assigns an available IP address from the pool and connects the Pod to a software bridge in the virtual machine. When the Pod is terminated, the IP address is returned back to the pool of addresses. The following picture shows how Pods connect to a virtual network:
