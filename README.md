@@ -79,6 +79,7 @@ Non-overlapping with AKS Subnet
 
 # What is a Service?
 Logical set of Pods and a policy by which to access them. 
+
 The set of Pods targeted by a Service is (usually) determined by a Label Selector.
 
 #Accessing services from inside the cluster
