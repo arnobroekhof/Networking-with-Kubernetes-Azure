@@ -14,12 +14,12 @@ At a high level, the plug-in provides the following capabilities:
 *   Pods can be assigned a public IP address, which makes them directly accessible from the internet. Pods can also access the internet themselves.
 *   It works seamlessly with Kubernetes resources such as Services, Ingress controllers, and Kube DNS. A Kubernetes Service can also be exposed internally or externally through the Azure Load Balancer.
 
-![alt text](https://github.com/jgmitter/images/blob/master/s1.png)
+![alt text](images/s1.png)
  
 # Connecting Pods to a virtual network
 Pods are hosted within a virtual machine that is part of a virtual network. A pool of IP addresses for the Pods is configured as secondary addresses on a virtual machine's network interface. Azure CNI sets up the basic Network connectivity for Pods and manages the utilisation of the IP addresses in the pool. When a Pod is spun up in the virtual machine, Azure CNI assigns an available IP address from the pool and connects the Pod to a software bridge in the virtual machine. When the Pod is terminated, the IP address is returned back to the pool of addresses. The following picture shows how Pods connect to a virtual network:
 
- ![alt text](https://github.com/jgmitter/images/blob/master/s2.png)
+ ![alt text](images/s2.png)
 
 # Internet access
 To enable Pods to access the internet, the plug-in configures iptables rules to network address translate (NAT) the internet bound traffic from Pods. The source IP address of the packet is translated to the primary IP address on the virtual machine's network interface. Windows virtual machines automatically source NAT (SNAT) traffic destined to IP addresses outside the subnet the virtual machine is in. Typically, all traffic destined to an IP address outside of the IP range of the virtual network is translated.
@@ -43,13 +43,13 @@ Uses kubenet network plugin and has the following features:
 *   Nodes and Pods are placed on different IP subnets
 *   User Defined Routing and IP Forwarding is for connectivity between Pods across Nodes.
 
-![alt text](https://github.com/jgmitter/images/blob/master/s3.png)
+![alt text](images/s3.png)
 
 This approach has some drawbacks, including degraded performance, the need to manage two IP CIDRs and complexity with Peering and On-Premise connectivity. For these reasons, you may want to consider the Advanced Networking option. 
 
 # Advance Networking 
  
-![alt text](https://github.com/jgmitter/images/blob/master/s4.png)
+![alt text](images/s4.png)
  
 Unlike the basic networking approach, using the Advance Networking enabled by the CNI plug-in allows us to only manage a single IP CIDR. Offers better performance and supports both peering and on-premise connectivity out of the box. 
 
@@ -64,7 +64,7 @@ Microsoft.Network/virtualNetworks/subnets/read
 
 # Planning IP addressing for your cluster
 
-![alt text](https://github.com/jgmitter/images/blob/master/s5.png)
+![alt text](images/s5.png)
  
 # Additional subnets
 *   Kubernetes service address range
@@ -103,7 +103,7 @@ Service provides important features that are standardized across the cluster: lo
 
 # Internal and External Load Balancer
 
-![alt text](https://github.com/jgmitter/images/blob/master/s6.png)
+![alt text](images/s6.png)
 
 To provide access to your applications in Azure Kubernetes Service (AKS), you can create and use an Azure Load Balancer. A load balancer running on AKS can be used as an internal or an external load balancer. An internal load balancer makes a Kubernetes service accessible only to applications running in the same virtual network as the AKS cluster. An external load balancer receives one or more public IPs for ingress and makes a Kubernetes service accessible externally using the public IPs.
 
@@ -116,32 +116,32 @@ One more thing to remember is that Basic Load Balancer is not accessible across 
 # Create an internal load balancer
 To create an internal load balancer, create a service manifest named internal-lb.yaml with the service type LoadBalancer and the azure-load-balancer-internal annotation as shown in the following example:
 
-![alt text](https://github.com/jgmitter/images/blob/master/s7.png)
+![alt text](images/s7.png)
 
-![alt text](https://github.com/jgmitter/images/blob/master/s8.png)
+![alt text](images/s8.png)
 
 An Azure load balancer is created in the node resource group and connected to the same virtual network as the AKS cluster.
 
 When you view the service details, the IP address of the internal load balancer is shown in the EXTERNAL-IP column. In this context, External is in relation to the external interface of the load balancer, not that it receives a public, external IP address. It may take a minute or two for the IP address to change from <pending> to an actual internal IP address, as shown in the following example:
  
-![alt text](https://github.com/jgmitter/images/blob/master/s9.png)
+![alt text](images/s9.png)
  
 
 # Specify an IP address
 If you would like to use a specific IP address with the internal load balancer, add the loadBalancerIP property to the load balancer YAML manifest. The specified IP address must reside in the same subnet as the AKS cluster and must not already be assigned to a resource.
 
-![alt text](https://github.com/jgmitter/images/blob/master/s10.png)
+![alt text](images/s10.png)
 
 When deployed and you view the service details, the IP address in the EXTERNAL-IP column reflects your specified IP address
 
-![alt text](https://github.com/jgmitter/images/blob/master/s11.png)
+![alt text](images/s11.png)
  
-![alt text](https://github.com/jgmitter/images/blob/master/s12.png)
+![alt text](images/s12.png)
 
 # Specify a different subnet
 To specify a subnet for your load balancer, add the azure-load-balancer-internal-subnet annotation to your service. The subnet specified must be in the same virtual network as your AKS cluster. When deployed, the load balancer EXTERNAL-IP address is part of the specified subnet.
 
-![alt text](https://github.com/jgmitter/images/blob/master/s13.png)
+![alt text](images/s13.png)
 
  
 # Delete the load balancer
@@ -166,7 +166,7 @@ To increase the security of your AKS cluster, you may wish to restrict egress tr
 *   NAT Rules
 *    TCP Port 22 to AKS Destination Addresses for the Region
 
- ![alt text](https://github.com/jgmitter/images/blob/master/s14.png)
+ ![alt text](images/s14.png)
 
 You can use Azure Firewall or a 3rd-party firewall appliance to secure your egress traffic and define these required ports and addresses. AKS does not automatically create these rules for you. The following ports and addresses are for reference as you create the appropriate rules in your network firewall.
 
@@ -178,7 +178,7 @@ AKS manages your hosted Kubernetes environment. AKS makes it quick and easy to d
 
 An ingress controller is a piece of software that provides reverse proxy, configurable traffic routing, and TLS termination for Kubernetes services. Kubernetes ingress resources are used to configure the ingress rules and routes for individual Kubernetes services. Using an ingress controller and ingress rules, a single IP address can be used to route traffic to multiple services in a Kubernetes cluster. All the above functionalities are provided by Azure Application Gateway, which makes it an ideal Ingress controller for Kubernetes on Azure.
 
-![alt text](https://github.com/jgmitter/images/blob/master/s15.png)
+![alt text](images/s15.png)
 
 https://github.com/Azure/application-gateway-kubernetes-ingress
 
@@ -203,7 +203,7 @@ https://github.com/Azure/application-gateway-kubernetes-ingress
 # Networking policy
 A Policy solution is an implementation of this specification that listen to the Kubernetes API and enforces the defined policies. Usually runs as a daemonset   which make sure that an instance of a specific pod is running on all (or a selection of) nodes in a cluster. It creates pods on each added node and garbage collects pods when nodes are removed from the cluster.
  
-![alt text](https://github.com/jgmitter/images/blob/master/s16.png)
+![alt text](images/s16.png)
  
 *   Azure Policy plugin is Open Source on GitHub, 
 *   Uses Linux IPTables to enforce the policies
@@ -215,7 +215,7 @@ A Policy solution is an implementation of this specification that listen to the 
 *   Supported for Kubernetes DIY clusters in Azure
 *   Supports Linux hosts
  
-![alt text](https://github.com/jgmitter/images/blob/master/s17.png)
+![alt text](images/s17.png)
 
 # Structure of a networking policy
 
@@ -223,7 +223,7 @@ Remember that all Pods are non-isolated by defaults, they are running on a flat 
 By default, they accept traffic from anyone and if customer has a multi stage/zone project this could expose security risks. You can think of 3 tier webapp but also Front end could technically talk to DB on other pods.
 Networking Policy create a micro segmentation for containers, like Network Security Group provides for VM’s in the subnet of a Virtual Network in Azure.
 
-![alt text](https://github.com/jgmitter/images/blob/master/s18.png)
+![alt text](images/s18.png)
 
 If no ingress or egress rules are specified, then traffic to/from the selected Pods is disallowed, Let's say you likely want to block traffic directly to back-end applications, you’ll need to apply a policy on the ingress rule to allow traffic to the Pod selected matching one or more specified sources on the specific port, with IP from CIDR range, Pod Namespace and or Pod Label
 You can apply multiple policy yaml files
@@ -233,56 +233,8 @@ kubectl delete –f policy.yaml
 
 About Calico on Azure
 
-![alt text](https://github.com/jgmitter/images/blob/master/s19.png)
+![alt text](images/s19.png)
 
-For more information please check our Microsoft Website:
+For more information please check the Microsoft Website:
 https://docs.microsoft.com/en-us/azure/aks/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Contributing
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-# Legal Notices
-
-Microsoft and any contributors grant you a license to the Microsoft documentation and other content
-in this repository under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/legalcode),
-see the [LICENSE](LICENSE) file, and grant you a license to any code in the repository under the [MIT License](https://opensource.org/licenses/MIT), see the
-[LICENSE-CODE](LICENSE-CODE) file.
-
-Microsoft, Windows, Microsoft Azure and/or other Microsoft products and services referenced in the documentation
-may be either trademarks or registered trademarks of Microsoft in the United States and/or other countries.
-The licenses for this project do not grant you rights to use any Microsoft names, logos, or trademarks.
-Microsoft's general trademark guidelines can be found at http://go.microsoft.com/fwlink/?LinkID=254653.
-
-Privacy information can be found at https://privacy.microsoft.com/en-us/
-
-Microsoft and any contributors reserve all other rights, whether under their respective copyrights, patents,
-or trademarks, whether by implication, estoppel or otherwise.
